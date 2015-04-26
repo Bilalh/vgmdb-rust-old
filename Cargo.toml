@@ -3,3 +3,6 @@
 name = "vgmdb-rust"
 version = "0.0.1"
 authors = ["Bilal Syed Hussain <bilalshussain@gmail.com>"]
+
+[dependencies]
+id3 = "*"
