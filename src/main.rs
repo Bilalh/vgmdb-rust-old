@@ -13,10 +13,29 @@ extern crate rustc_serialize;
 use rustc_serialize::json;
 
 #[derive(RustcDecodable, RustcEncodable, Debug )]
-pub struct VgmdbResult {
-    release_date: String
+struct Disc{
+      disc_length: String
+    , name: String
+    , tracks: Vec<Track>
 }
 
+#[derive(RustcDecodable, RustcEncodable, Debug )]
+struct VgmdbResult {
+      release_date: String
+    , discs: Vec<Disc>
+    , catalog: Option<String>
+}
+
+#[derive(RustcDecodable, RustcEncodable, Debug )]
+struct Track{
+      names: Names
+    , track_length: String
+}
+
+#[derive(RustcDecodable, RustcEncodable, Debug )]
+struct Names{
+    English: String
+}
 
 fn print_id3_tags(tag:Tag){
     println!("{}", tag.artist().unwrap() );
