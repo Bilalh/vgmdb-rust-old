@@ -6,3 +6,4 @@ authors = ["Bilal Syed Hussain <bilalshussain@gmail.com>"]
 
 [dependencies]
 id3 = "*"
+rustc-serialize = "0.3"

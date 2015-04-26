@@ -1,9 +1,18 @@
 extern crate id3;
-
 use id3::Tag;
 
+extern crate rustc_serialize;
+use rustc_serialize::json;
+
+#[derive(RustcDecodable, RustcEncodable)]
+pub struct VgmdbResult {
+    artist: String
+}
+
+
 fn print_id3_tags(tag:Tag){
-    print!("{}", tag.artist().unwrap() );
+    println!("{}", tag.artist().unwrap() );
+    println!("{}", tag.title().unwrap() );
 }
 
 fn main() {
@@ -13,5 +22,12 @@ fn main() {
        Ok(t)    =>  print_id3_tags(t),
        Err(_)   =>  ()
     };
+
+    let obj = VgmdbResult{
+        artist: "Green World".to_string()
+    };
+
+    let encoded = json::encode(&obj).unwrap();
+    println!("{}", encoded)
 
 }
