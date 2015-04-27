@@ -2,6 +2,7 @@ use std::error::Error;
 use std::string::FromUtf8Error;
 use std::fmt;
 use std::io;
+use rustc_serialize::json;
 
 pub type VgResult<A> = Result<A,CmdError>;
 
@@ -21,6 +22,12 @@ impl From<FromUtf8Error> for CmdError {
 impl From<io::Error> for CmdError {
     fn from(err: io::Error) -> CmdError {
         CmdError::IoError(err)
+    }
+}
+
+impl From<json::DecoderError> for CmdError {
+    fn from(err: json::DecoderError) -> CmdError {
+        CmdError::OtherError(format!("Json decode Error {:?}", err.description() ))
     }
 }
 
