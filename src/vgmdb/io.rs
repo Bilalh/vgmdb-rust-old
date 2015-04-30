@@ -10,24 +10,28 @@ use rustc_serialize::json;
 use vgmdb::errors::*;
 use vgmdb::data::*;
 
-pub fn get_album(id: i32) -> VgResult<Album<Track>>{
+pub fn get_album(id: i32) -> VgResult<Album>{
     let html = try!( download_album_url(id) );
-    let album : Album<TrackDb> = try!( json::decode(&html));
+    let album : AlbumDb = try!( json::decode(&html));
     Ok(album.parse_tracks())
 }
 
-impl Album<TrackDb> {
-    fn parse_tracks (self) -> Album<Track> {
-        let new_discs : Vec<Disc<Track>>  = self.discs
+impl AlbumDb {
+    fn parse_tracks (self) -> Album {
+        let new_discs : Vec<Disc>  = self.discs
             .into_iter().map(  convert_disc  ).collect();
         return Album{ release_date : self.release_date
                     , discs:  new_discs
-                    , catalog : self.catalog};
+                    , catalog : self.catalog
+                    , category : self.category
+                    , classification : self.classification
+                    };
     }
 }
 
 fn download_album_url(id: i32) -> VgResult<String>{
     let url = format!("http://vgmdb.info/album/{}?format=json",id);
+    println!("{}",url);
     let Output{status, stdout, .. } = try!( Command::new("curl").arg(&url).output()  );
 
     if ! status.success(){
@@ -38,21 +42,20 @@ fn download_album_url(id: i32) -> VgResult<String>{
     return Ok(res);
 }
 
-fn convert_disc( d: Disc<TrackDb> ) -> Disc<Track> {
+fn convert_disc( d: DiscDb ) -> Disc {
    Disc{ name: d.name
-       , disc_length: d.disc_length
-       // , disc_length: convert_time(d.disc_length)
-       , tracks: d.tracks.into_iter().map(convert_track).collect()
+       , disc_length: convert_time(d.disc_length)
+       , tracks: d.tracks.into_iter().zip((1..)).map(|(t,i)|  convert_track(t, i) ).collect()
        }
 }
 
-fn convert_track( t : TrackDb) -> Track {
+fn convert_track( t : TrackDb, index : i32 ) -> Track {
 
     let length = convert_time(t.track_length);
     let a  = [ t.names.English, t.names.Romaji, t.names.Japanese  ]
              .iter_mut().filter_map(|x| x.take()).nth(0).unwrap();
 
-    Track{name:a, track_length:length }
+    Track{name:a, track_length:length, index:index }
 }
 
 fn convert_time(time: String) -> i32 {
@@ -67,31 +70,4 @@ fn convert_time(time: String) -> i32 {
     return length;
 }
 
-
-pub fn decode_album(path:&'static str){
-    let path = Path::new(path);
-    let display = path.display();
-
-    // Open the path in read-only mode, returns `io::Result<File>`
-    let mut file = match File::open(&path) {
-        // The `description` method of `io::Error` returns a string that
-        // describes the error
-        Err(why) => panic!("couldn't open {}: {}", display,
-                                                   Error::description(&why)),
-        Ok(file) => file,
-    };
-
-    // Read the file contents into a string, returns `io::Result<usize>`
-    let mut s = String::new();
-    match file.read_to_string(&mut s) {
-        Err(why) => panic!("couldn't read {}: {}", display,
-                                                   Error::description(&why)),
-        Ok(_) => {
-            let decoded : Album<TrackDb>  = json::decode(&s).unwrap();
-            print!("decoded:{:?}", decoded)
-        }
-    }
-
-
-}
 
