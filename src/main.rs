@@ -1,4 +1,4 @@
-// Breakes on VBR files
+// Breakes on VBR files?
 
 
 mod vgmdb;
@@ -22,10 +22,13 @@ fn print_id3_tags(tag:Tag){
 
 fn main() {
 
-    let album = vgmdb::io::get_album(44046).unwrap();
+    // let dir      = "mp3s_examples/Ar nosurge Genometric Concert side.蒼〜刻神楽〜";
+    // let album_id = 44046
+    let dir         = "mp3s_examples/Twilight Hour アーシャのアトリエ〜黄昏の大地の錬金術士〜 ボーカルアルバム";
+    let album_id    = 32234;
 
-    let dir       = "mp3s_examples/Ar nosurge Genometric Concert side.蒼〜刻神楽〜";
-    let dir_paths = fs::read_dir(&Path::new(dir)).unwrap();
+    let album     = vgmdb::io::get_album(album_id).unwrap();
+    let dir_paths = fs::read_dir    (&Path::new(dir)).unwrap();
 
     let paths = dir_paths
         .filter_map(|x| x.ok())
@@ -35,6 +38,7 @@ fn main() {
     let tracks_len = tracks.len();
     let discs_len = album.discs.len();
 
+    println!("Album: {:?}", album );
     for (path,(disc_num,track)) in paths.zip(tracks) {
         let p = path.path();
         let s = format!("{}", p.display());
@@ -42,10 +46,10 @@ fn main() {
         println!("Data: {:?}", track );
 
         let comment = format!("{}\n{}\n{} - {}", ""
-                             , album.catalog.clone().unwrap_or("".to_string())
-                             , album.category.clone().unwrap_or("".to_string())
-                             , album.classification.clone().unwrap_or("".to_string())
-                             );
+                     , album.catalog.clone().unwrap_or("".to_string())
+                     , album.category.clone().unwrap_or("".to_string())
+                     , album.classification.clone().unwrap_or("".to_string())
+                     );
 
         let mut tag = Tag::read_from_path(p).unwrap();
 
@@ -57,19 +61,24 @@ fn main() {
 
         if let Some(ref date) = album.release_date{
             set_release_date(&mut tag,date.clone());
+            let year_str:String = date.chars().take(4).collect();
+
+            if let Ok(year) = year_str.parse(){
+                set_year_id2_3(&mut tag, year);
+            }
         }
 
         tag.remove_comment(None, None);
         tag.add_comment("", comment);
 
         tag.save();
-        // set_year_id2_3(&mut tag,1393);
 
         println!("Processed: {}", s);
         println!("   ");
     }
 
 }
+
 
 fn set_year_id2_3(t:&mut Tag , year: i32) {
     t.add_text_frame("TDRC", format!("{}", year));
