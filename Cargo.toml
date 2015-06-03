@@ -9,3 +9,6 @@ id3 = "*"
 rustc-serialize = "0.3"
 hyper = "*"
 url="*"
+
+[profile.dev]
+debug = true   # Controls whether the compiler passes -g or `--cfg ndebug`

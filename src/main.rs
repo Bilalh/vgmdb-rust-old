@@ -10,6 +10,9 @@ use id3::Tag;
 use std::fs;
 use std::path::Path;
 
+use std::ffi::OsStr;
+
+
 
 fn print_id3_tags(tag:Tag){
     println!("{}", tag.artist().unwrap() );
@@ -21,15 +24,21 @@ fn main() {
 
     let album = vgmdb::io::get_album(44046).unwrap();
 
-    let paths = fs::read_dir(&Path::new("mp3s_examples/Ar nosurge Genometric Concert side.蒼〜刻神楽〜")).unwrap();
+    let dir       = "mp3s_examples/Ar nosurge Genometric Concert side.蒼〜刻神楽〜";
+    let dir_paths = fs::read_dir(&Path::new(dir)).unwrap();
+
+    let paths = dir_paths
+        .filter_map(|x| x.ok())
+        .filter(|x| x.path().extension().and_then(OsStr::to_str) == Some("mp3"));
 
     let tracks = album.tracks();
     let tracks_len = tracks.len();
     let discs_len = album.discs.len();
 
     for (path,(disc_num,track)) in paths.zip(tracks) {
-        let p = path.unwrap().path();
-        println!("Path: {}", p.display());
+        let p = path.path();
+        let s = format!("{}", p.display());
+        println!("Path: {}", s);
         println!("Data: {:?}", track );
 
         let comment = format!("{}\n{}\n{} - {}", ""
@@ -56,6 +65,8 @@ fn main() {
         tag.save();
         // set_year_id2_3(&mut tag,1393);
 
+        println!("Processed: {}", s);
+        println!("   ");
     }
 
 }
