@@ -25,6 +25,7 @@ impl AlbumDb {
                     , catalog : self.catalog
                     , category : self.category
                     , classification : self.classification
+                    , name: self.name
                     };
     }
 }

@@ -8,6 +8,7 @@ pub struct AlbumT<T> {
     , pub catalog: Option<String>
     , pub category: Option<String>
     , pub classification: Option<String>
+    , pub name: String
 }
 
 #[derive(RustcDecodable, RustcEncodable, Debug )]

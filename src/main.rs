@@ -9,7 +9,6 @@ extern crate rustc_serialize;
 use id3::Tag;
 use std::fs;
 use std::path::Path;
-
 use std::ffi::OsStr;
 
 
@@ -45,15 +44,29 @@ fn main() {
         println!("Path: {}", s);
         println!("Data: {:?}", track );
 
-        let comment = format!("{}\n{}\n{} - {}", ""
-                     , album.catalog.clone().unwrap_or("".to_string())
-                     , album.category.clone().unwrap_or("".to_string())
-                     , album.classification.clone().unwrap_or("".to_string())
-                     );
+
+
+
+
+        let mut buf = album.category.clone().unwrap_or("".to_string());
+        if let Some(o) = album.classification.clone(){
+            if buf.is_empty(){
+                buf = o;
+            }else{
+                buf = format!("{}, {}",buf,o);
+            }
+        }
+
+        let comment = format!("\n{}, vgmdb.net/album/{}\n{}"
+                             , album.catalog.clone().unwrap_or("".to_string())
+                             , album_id
+                             , buf );
 
         let mut tag = Tag::read_from_path(p).unwrap();
 
         tag.set_title(track.name.clone());
+        tag.set_album(album.name.clone());
+
         tag.set_track(track.index as u32);
         tag.set_total_tracks(tracks_len as u32);
         tag.set_disc(disc_num as u32);
@@ -67,6 +80,7 @@ fn main() {
                 set_year_id2_3(&mut tag, year);
             }
         }
+
 
         tag.remove_comment(None, None);
         tag.add_comment("", comment);
