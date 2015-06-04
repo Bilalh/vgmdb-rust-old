@@ -1,6 +1,3 @@
-// Breakes on VBR files?
-
-
 mod vgmdb;
 
 extern crate id3;
@@ -10,42 +7,48 @@ use id3::Tag;
 use std::fs;
 use std::path::Path;
 use std::ffi::OsStr;
+use std::env;
 
 
-
-fn print_id3_tags(tag:Tag){
-    println!("{}", tag.artist().unwrap() );
-    println!("{}", tag.title().unwrap() );
+fn get_args() -> (String, i32) {
+    if let (Some(album), Some(id)) = (env::args().nth(1),env::args().nth(2)) {
+        if let Ok(nid)= id.parse::<i32>(){
+            return (album,nid)
+        }else{
+            panic!("Usage: album id");
+        }
+    }else{
+        panic!("Usage: album id");
+    };
 }
 
-
 fn main() {
-
-    // let dir      = "mp3s_examples/Ar nosurge Genometric Concert side.蒼〜刻神楽〜";
-    // let album_id = 44046
-    let dir         = "mp3s_examples/Twilight Hour アーシャのアトリエ〜黄昏の大地の錬金術士〜 ボーカルアルバム";
-    let album_id    = 32234;
+    let (dir,album_id) = get_args();
 
     let album     = vgmdb::io::get_album(album_id).unwrap();
-    let dir_paths = fs::read_dir    (&Path::new(dir)).unwrap();
+    let dir_paths = fs::read_dir    (&Path::new(&dir)).unwrap();
 
-    let paths = dir_paths
+    let paths : Vec<_> = dir_paths
         .filter_map(|x| x.ok())
-        .filter(|x| x.path().extension().and_then(OsStr::to_str) == Some("mp3"));
+        .filter(|x| x.path().extension().and_then(OsStr::to_str) == Some("mp3"))
+        .collect();
 
     let tracks = album.tracks();
     let tracks_len = tracks.len();
     let discs_len = album.discs.len();
 
     println!("Album: {:?}", album );
-    for (path,(disc_num,track)) in paths.zip(tracks) {
+
+    let dir_len = paths.len();
+    if dir_len != tracks_len{
+        panic!("Lengths not equal, tracks {} != dir {} ", tracks_len, dir_len)
+    }
+
+    for (path,(disc_num,track)) in paths.iter().zip(tracks) {
         let p = path.path();
         let s = format!("{}", p.display());
         println!("Path: {}", s);
         println!("Data: {:?}", track );
-
-
-
 
 
         let mut buf = album.category.clone().unwrap_or("".to_string());
@@ -57,10 +60,11 @@ fn main() {
             }
         }
 
-        let comment = format!("\n{}, vgmdb.net/album/{}\n{}"
-                             , album.catalog.clone().unwrap_or("".to_string())
-                             , album_id
-                             , buf );
+        let comment = format!(
+               "\n{}, vgmdb.net/album/{}, amazon,\n{}"
+             , album.catalog.clone().unwrap_or("".to_string())
+             , album_id
+             , buf );
 
         let mut tag = Tag::read_from_path(p).unwrap();
 

@@ -13,6 +13,7 @@ use vgmdb::data::*;
 pub fn get_album(id: i32) -> VgResult<Album>{
     let html = try!( download_album_url(id) );
     let album : AlbumDb = try!( json::decode(&html));
+    println!("Json {:?}", album);
     Ok(album.parse_tracks())
 }
 
@@ -65,7 +66,7 @@ fn convert_time(time: String) -> i32 {
 
     for part in ( time.rsplit(":") ) {
         // println!("part {}", part  );
-        length += mult * part.parse::<i32>().unwrap();
+        length += mult * part.parse::<i32>().unwrap_or(0);
         mult *= 60;
     };
     return length;
