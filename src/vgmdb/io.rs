@@ -13,7 +13,7 @@ use vgmdb::data::*;
 pub fn get_album(id: i32) -> VgResult<Album>{
     let html = try!( download_album_url(id) );
     let album : AlbumDb = try!( json::decode(&html));
-    println!("Json {:?}", album);
+    // println!("Json {:?}", album);
     Ok(album.parse_tracks())
 }
 

@@ -14,6 +14,7 @@ use std::process::exit;
 
 use argparse::{ArgumentParser, StoreTrue,StoreFalse, Store};
 
+#[derive(Debug)]
 struct Options {
     lengthCheck: bool,
     dir: String,
@@ -22,7 +23,7 @@ struct Options {
 
 fn get_args() -> Options {
     let mut options = Options {
-        lengthCheck: false,
+        lengthCheck: true,
         dir: "".to_string(),
         albumId: 0
     };
@@ -46,6 +47,7 @@ fn get_args() -> Options {
 
 fn main() {
     let options = get_args();
+    println!("Args: {:?}", options);
 
     let album     = vgmdb::io::get_album(options.albumId).unwrap();
     let dir_paths = fs::read_dir    (&Path::new(&options.dir)).unwrap();
@@ -62,7 +64,7 @@ fn main() {
     println!("Album: {:?}", album );
 
     let dir_len = paths.len();
-    if dir_len != tracks_len{
+    if options.lengthCheck && dir_len != tracks_len{
         panic!("Lengths not equal, tracks {} != dir {} ", tracks_len, dir_len)
     }
 
