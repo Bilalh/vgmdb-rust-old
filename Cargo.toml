@@ -1,7 +1,7 @@
 [package]
 
 name = "vgmdb-rust"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["Bilal Syed Hussain <bilalshussain@gmail.com>"]
 
 [dependencies]
@@ -9,6 +9,8 @@ id3 = "*"
 rustc-serialize = "0.3"
 hyper = "*"
 url="*"
+argparse = "*"
+
 
 [profile.dev]
 debug = true   # Controls whether the compiler passes -g or `--cfg ndebug`

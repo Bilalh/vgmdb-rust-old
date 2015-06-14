@@ -2,31 +2,53 @@ mod vgmdb;
 
 extern crate id3;
 extern crate rustc_serialize;
+extern crate argparse;
+
 
 use id3::Tag;
 use std::fs;
 use std::path::Path;
 use std::ffi::OsStr;
 use std::env;
+use std::process::exit;
 
+use argparse::{ArgumentParser, StoreTrue,StoreFalse, Store};
 
-fn get_args() -> (String, i32) {
-    if let (Some(album), Some(id)) = (env::args().nth(1),env::args().nth(2)) {
-        if let Ok(nid)= id.parse::<i32>(){
-            return (album,nid)
-        }else{
-            panic!("Usage: album id");
-        }
-    }else{
-        panic!("Usage: album id");
+struct Options {
+    lengthCheck: bool,
+    dir: String,
+    albumId: i32
+}
+
+fn get_args() -> Options {
+    let mut options = Options {
+        lengthCheck: false,
+        dir: "".to_string(),
+        albumId: 0
     };
+    {
+        let mut ap = ArgumentParser::new();
+        ap.set_description("Greet somebody.");
+        ap.refer(&mut options.dir)
+            .add_argument("dir", Store,
+            "Directory of mp3s").required();
+        ap.refer(&mut options.albumId)
+            .add_argument("albumId", Store,
+            "Id from from vgmdb").required();
+        ap.refer(&mut options.lengthCheck)
+            .add_option(&["-l", "--no-length-check"], StoreFalse,
+            "Continue even if there is mismatch in lengths of the dir and db");
+
+        ap.parse_args_or_exit();
+    }
+    return options
 }
 
 fn main() {
-    let (dir,album_id) = get_args();
+    let options = get_args();
 
-    let album     = vgmdb::io::get_album(album_id).unwrap();
-    let dir_paths = fs::read_dir    (&Path::new(&dir)).unwrap();
+    let album     = vgmdb::io::get_album(options.albumId).unwrap();
+    let dir_paths = fs::read_dir    (&Path::new(&options.dir)).unwrap();
 
     let paths : Vec<_> = dir_paths
         .filter_map(|x| x.ok())
@@ -63,7 +85,7 @@ fn main() {
         let comment = format!(
                "\n{}, vgmdb.net/album/{}, amazon,\n{}"
              , album.catalog.clone().unwrap_or("".to_string())
-             , album_id
+             , options.albumId
              , buf );
 
         let mut tag = Tag::read_from_path(p).unwrap();
