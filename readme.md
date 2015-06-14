@@ -1,5 +1,8 @@
 vgmdb-rust
-=========
+==========
+
+[![Build Status](https://travis-ci.org/jameshurst/rust-id3.svg)](https://travis-ci.org/jameshurst/rust-id3)
+
 
 Retags mp3 using data from vgmdb. Only uses the English track names at the moment.
 
