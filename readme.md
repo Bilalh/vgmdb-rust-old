@@ -1,7 +1,7 @@
 vgmdb-rust
 =========
 
-Retags mp3 using data from vgmdb. Only uses the english track names at the moment.
+Retags mp3 using data from vgmdb. Only uses the English track names at the moment.
 
 Usage
 -----
