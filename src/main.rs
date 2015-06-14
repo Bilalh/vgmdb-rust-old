@@ -29,7 +29,7 @@ fn get_args() -> Options {
     };
     {
         let mut ap = ArgumentParser::new();
-        ap.set_description("Greet somebody.");
+        ap.set_description("Tags mp3s using vgmdb");
         ap.refer(&mut options.dir)
             .add_argument("dir", Store,
             "Directory of mp3s").required();
@@ -38,7 +38,7 @@ fn get_args() -> Options {
             "Id from from vgmdb").required();
         ap.refer(&mut options.lengthCheck)
             .add_option(&["-l", "--no-length-check"], StoreFalse,
-            "Continue even if there is mismatch in lengths of the dir and db");
+            "Continue even if there is mismatch in number of tracks  of the dir and db");
 
         ap.parse_args_or_exit();
     }
