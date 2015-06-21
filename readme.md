@@ -9,7 +9,7 @@ Usage
 -----
 
 ```
-vgmdb-rust <dir>  <vgmdb album id>
+vgmdb <dir>  <vgmdb album id>
 ```
 
 Licence
