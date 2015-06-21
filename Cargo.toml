@@ -4,6 +4,10 @@ name = "vgmdb-rust"
 version = "0.2.0"
 authors = ["Bilal Syed Hussain <bilalshussain@gmail.com>"]
 
+description = "Retag mp3s using vgmdb "
+homepage = "https://github.com/Bilalh/vgmdb-rust"
+repository= "https://github.com/Bilalh/vgmdb-rust"
+
 [dependencies]
 id3 = "*"
 rustc-serialize = "0.3"
