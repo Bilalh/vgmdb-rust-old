@@ -16,14 +16,20 @@ use argparse::{ArgumentParser,StoreFalse, Store};
 struct Options {
     length_check: bool,
     dir: String,
-    album_id: i32
+    album_id: i32,
+    tag_album : bool,
+    tag_title : bool,
+    tag_num   : bool
 }
 
 fn get_args() -> Options {
     let mut options = Options {
         length_check: true,
         dir: "".to_string(),
-        album_id: 0
+        album_id: 0,
+        tag_album: true,
+        tag_title: true,
+        tag_num: true
     };
     {
         let mut ap = ArgumentParser::new();
@@ -37,7 +43,15 @@ fn get_args() -> Options {
         ap.refer(&mut options.length_check)
             .add_option(&["-l", "--no-length-check"], StoreFalse,
             "Continue even if there is mismatch in number of tracks  of the dir and the db");
-
+        ap.refer(&mut options.tag_album)
+            .add_option(&["-a", "--no-tag-album"], StoreFalse,
+            "Don't change the album name ");
+        ap.refer(&mut options.tag_title)
+            .add_option(&["-t", "--no-tag-title"], StoreFalse,
+            "Don't change the track name ");
+        ap.refer(&mut options.tag_num)
+            .add_option(&["-n", "--no-tag-num"], StoreFalse,
+            "Don't change the track number/disc number ");
         ap.parse_args_or_exit();
     }
     return options
@@ -90,13 +104,20 @@ fn main() {
 
         let mut tag = Tag::read_from_path(p).unwrap();
 
-        tag.set_title(track.name.clone());
-        tag.set_album(album.name.clone());
+        if options.tag_title{
+            tag.set_title(track.name.clone());
+        }
+        if options.tag_album{
+            tag.set_album(album.name.clone());
+        }
 
-        tag.set_track(track.index as u32);
-        tag.set_total_tracks(tracks_len as u32);
-        tag.set_disc(disc_num as u32);
-        tag.set_total_discs(discs_len as u32);
+        if options.tag_num{
+            tag.set_track(track.index as u32);
+            tag.set_total_tracks(tracks_len as u32);
+            tag.set_disc(disc_num as u32);
+            tag.set_total_discs(discs_len as u32);
+        }
+
 
         if let Some(ref date) = album.release_date{
             set_release_date(&mut tag,date.clone());
