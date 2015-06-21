@@ -2,14 +2,27 @@ vgmdb-rust
 ==========
 
 [![Build Status](https://travis-ci.org/Bilalh/vgmdb-rust.svg?branch=master)](https://travis-ci.org/Bilalh/vgmdb-rust)
+[![](http://meritbadge.herokuapp.com/vgmdb)](https://crates.io/crates/vgmdb)
 
-Retags mp3 using data from vgmdb. Only uses the English track names at the moment.
+Retags mp3 using data from vgmdb. Only uses the English names at the moment.
 
 Usage
 -----
 
 ```
-vgmdb <dir>  <vgmdb album id>
+Usage:
+    ./vgmdb [OPTIONS] DIR ALBUM_ID
+
+Tags mp3s using vgmdb
+
+positional arguments:
+  dir                   Directory of mp3s
+  album_id              Id from vgmdb
+
+optional arguments:
+  -h,--help             Show this help message and exit
+  -l,--no-length-check  Continue even if there is mismatch in the number of tracks
+                        of the dir and the db
 ```
 
 Licence
