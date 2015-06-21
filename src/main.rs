@@ -89,11 +89,9 @@ fn main() {
 
         let mut buf = album.category.clone().unwrap_or("".to_string());
         if let Some(o) = album.classification.clone(){
-            if buf.is_empty(){
-                buf = o;
-            }else{
-                buf = format!("{}, {}",buf,o);
-            }
+            buf = format!("{}, {},",buf,o);
+        }else{
+            buf = format!("{},", buf);
         }
 
         let comment = format!(
