@@ -1,10 +1,7 @@
 use std::process::Command;
 use std::process::Output;
 
-use std::error::Error;
-use std::fs::File;
 use std::io::prelude::*;
-use std::path::Path;
 use rustc_serialize::json;
 
 use vgmdb::errors::*;

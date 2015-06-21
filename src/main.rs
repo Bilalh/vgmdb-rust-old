@@ -9,23 +9,21 @@ use id3::Tag;
 use std::fs;
 use std::path::Path;
 use std::ffi::OsStr;
-use std::env;
-use std::process::exit;
 
-use argparse::{ArgumentParser, StoreTrue,StoreFalse, Store};
+use argparse::{ArgumentParser,StoreFalse, Store};
 
 #[derive(Debug)]
 struct Options {
-    lengthCheck: bool,
+    length_check: bool,
     dir: String,
-    albumId: i32
+    album_id: i32
 }
 
 fn get_args() -> Options {
     let mut options = Options {
-        lengthCheck: true,
+        length_check: true,
         dir: "".to_string(),
-        albumId: 0
+        album_id: 0
     };
     {
         let mut ap = ArgumentParser::new();
@@ -33,12 +31,12 @@ fn get_args() -> Options {
         ap.refer(&mut options.dir)
             .add_argument("dir", Store,
             "Directory of mp3s").required();
-        ap.refer(&mut options.albumId)
-            .add_argument("albumId", Store,
+        ap.refer(&mut options.album_id)
+            .add_argument("album_id", Store,
             "Id from from vgmdb").required();
-        ap.refer(&mut options.lengthCheck)
+        ap.refer(&mut options.length_check)
             .add_option(&["-l", "--no-length-check"], StoreFalse,
-            "Continue even if there is mismatch in number of tracks  of the dir and db");
+            "Continue even if there is mismatch in number of tracks  of the dir and the db");
 
         ap.parse_args_or_exit();
     }
@@ -49,7 +47,7 @@ fn main() {
     let options = get_args();
     println!("Args: {:?}", options);
 
-    let album     = vgmdb::io::get_album(options.albumId).unwrap();
+    let album     = vgmdb::io::get_album(options.album_id).unwrap();
     let dir_paths = fs::read_dir    (&Path::new(&options.dir)).unwrap();
 
     let paths : Vec<_> = dir_paths
@@ -64,7 +62,7 @@ fn main() {
     println!("Album: {:?}", album );
 
     let dir_len = paths.len();
-    if options.lengthCheck && dir_len != tracks_len{
+    if options.length_check && dir_len != tracks_len{
         panic!("Lengths not equal, tracks {} != dir {} ", tracks_len, dir_len)
     }
 
@@ -85,9 +83,9 @@ fn main() {
         }
 
         let comment = format!(
-               "\n{}, vgmdb.net/album/{}, amazon,\n{}"
+               "\n{}, vgmdb.net/album/{}, \n{}"
              , album.catalog.clone().unwrap_or("".to_string())
-             , options.albumId
+             , options.album_id
              , buf );
 
         let mut tag = Tag::read_from_path(p).unwrap();
@@ -113,9 +111,11 @@ fn main() {
         tag.remove_comment(None, None);
         tag.add_comment("", comment);
 
-        tag.save();
+        match  tag.save() {
+           Ok(_)  => println!("Processed: {}", s),
+           Err(e) => println!("Failed: {}, {}", s, e)
+        }
 
-        println!("Processed: {}", s);
         println!("   ");
     }
 
