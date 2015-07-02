@@ -22,7 +22,7 @@ struct Options {
     tag_num   : bool
 }
 
-fn get_args() -> Options {
+fn get_args() -> Options { 
     let mut options = Options {
         length_check: true,
         dir: "".to_string(),
