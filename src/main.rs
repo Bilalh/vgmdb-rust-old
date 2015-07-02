@@ -99,8 +99,10 @@ fn main() {
              , album.catalog.clone().unwrap_or("".to_string())
              , options.album_id
              , buf );
+        println!("\tDoing making comment");
 
         let mut tag = Tag::read_from_path(p).unwrap();
+        println!("\tDoing read tag");
 
         if options.tag_title{
             tag.set_title(track.name.clone());
@@ -108,6 +110,7 @@ fn main() {
         if options.tag_album{
             tag.set_album(album.name.clone());
         }
+        println!("\tDoing title album");
 
         if options.tag_num{
             tag.set_track(track.index as u32);
@@ -115,7 +118,7 @@ fn main() {
             tag.set_disc(disc_num as u32);
             tag.set_total_discs(discs_len as u32);
         }
-
+        println!("\tDoing nums");
 
         if let Some(ref date) = album.release_date{
             set_release_date(&mut tag,date.clone());
@@ -126,9 +129,12 @@ fn main() {
             }
         }
 
+        println!("\tDoing date");
 
         tag.remove_comment(None, None);
         tag.add_comment("", comment);
+
+        println!("\tDoing comment");
 
         match  tag.save() {
            Ok(_)  => println!("Processed: {}", s),
