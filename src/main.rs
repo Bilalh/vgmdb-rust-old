@@ -20,7 +20,8 @@ struct Options {
     tag_album : bool,
     tag_title : bool,
     tag_num   : bool,
-    whole_album_meta: bool
+    whole_album_meta: bool,
+    remove_url: bool
 }
 
 fn get_args() -> Options {
@@ -31,7 +32,8 @@ fn get_args() -> Options {
         tag_album: true,
         tag_title: true,
         tag_num: true,
-        whole_album_meta : false
+        whole_album_meta : false,
+        remove_url : true
     };
     {
         let mut ap = ArgumentParser::new();
@@ -116,10 +118,10 @@ fn do_per_album_meta(options:Options, paths:&Vec<std::fs::DirEntry>, album:vgmdb
              , album.catalog.clone().unwrap_or("".to_string())
              , options.album_id
              , buf );
-        println!("\tDoing making comment");
+        println!("\tDone making comment");
 
         let mut tag = Tag::read_from_path(p).unwrap();
-        println!("\tDoing read tag");
+        println!("\tDone read tag");
 
         if let Some(ref date) = album.release_date{
             set_release_date(&mut tag,date.clone());
@@ -130,12 +132,14 @@ fn do_per_album_meta(options:Options, paths:&Vec<std::fs::DirEntry>, album:vgmdb
             }
         }
 
-        println!("\tDoing date");
+        println!("\tDone date");
 
         tag.remove_comment(None, None);
         tag.add_comment("", comment);
 
-        println!("\tDoing comment");
+        println!("\tDone comment");
+
+        println!("\tRemoving ");
 
         match  tag.save() {
            Ok(_)  => println!("Processed: {}", s),
