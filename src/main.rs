@@ -3,7 +3,7 @@ mod vgmdb;
 extern crate id3;
 extern crate rustc_serialize;
 extern crate argparse;
-
+extern crate simple_parallel;
 
 use id3::Tag;
 use std::fs;
@@ -11,6 +11,7 @@ use std::path::Path;
 use std::ffi::OsStr;
 
 use argparse::{ArgumentParser,StoreFalse, Store, StoreTrue};
+
 
 #[derive(Debug)]
 struct Options {
@@ -100,8 +101,9 @@ fn main() {
 fn do_per_album_meta(options:Options, paths:&Vec<std::fs::DirEntry>, album:vgmdb::data::Album){
     println!("Album Metadata only");
 
-    for entry in paths.iter() {
+    let mut pool = simple_parallel::Pool::new(4);
 
+    pool.for_(paths.iter(), |entry| {
         let p = entry.path();
         let s = format!("{}", p.display());
         println!("Path: {}", s);
@@ -147,9 +149,10 @@ fn do_per_album_meta(options:Options, paths:&Vec<std::fs::DirEntry>, album:vgmdb
         }
 
         println!("   ");
+    });
 
 
-    }
+
 
 }
 

@@ -17,6 +17,7 @@ id3 = "*"
 rustc-serialize = "0.3"
 url="*"
 argparse = "*"
+simple_parallel = "0.2"
 
 
 [profile.dev]
