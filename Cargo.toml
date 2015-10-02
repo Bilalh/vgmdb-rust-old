@@ -15,7 +15,6 @@ keywords = ["mp3", "vgmdb", "id3", "id3v2", "music" ]
 [dependencies]
 id3 = "*"
 rustc-serialize = "0.3"
-hyper = "*"
 url="*"
 argparse = "*"
 
