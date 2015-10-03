@@ -121,6 +121,7 @@ fn do_per_album_meta(options:Options, paths:&Vec<std::fs::DirEntry>, album:vgmdb
              , options.album_id
              , buf );
         println!("\tDone making comment");
+        println!("\t {}", comment);
 
         let mut tag = Tag::read_from_path(p).unwrap();
         println!("\tDone read tag");
