@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-import logging
 import argparse
 import json
 
-from pprint import pprint
-from pathlib import Path
 from mutagen.mp4 import MP4
+from pathlib import Path
+from pprint import pprint
 
-logger = logging.getLogger(__name__)
-
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description="tag a m4a using vgmdb -J")
 parser.add_argument("dir", help='dir of m4a')
 parser.add_argument("json", help='json from vgmdb -J')
-# args = parser.parse_args()
-args = argparse.Namespace(dir="/Users/bilalh/aa", json="/Users/bilalh/aa/n.json")
+
+args = parser.parse_args()
+# args = argparse.Namespace(dir="/Users/bilalh/aa", json="/Users/bilalh/aa/n.json")
 pprint(args)
 
 data = json.load(Path(args.json).expanduser().open())
