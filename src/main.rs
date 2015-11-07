@@ -11,7 +11,9 @@ use std::path::Path;
 use std::ffi::OsStr;
 
 use argparse::{ArgumentParser,StoreFalse, Store, StoreTrue};
-
+use rustc_serialize::json;
+use std::io::prelude::*;
+use std::fs::File;
 
 #[derive(Debug)]
 struct Options {
@@ -22,7 +24,8 @@ struct Options {
     tag_title : bool,
     tag_num   : bool,
     whole_album_meta: bool,
-    remove_url: bool
+    remove_url: bool,
+    to_json: String
 }
 
 fn get_args() -> Options {
@@ -34,7 +37,8 @@ fn get_args() -> Options {
         tag_title: true,
         tag_num: true,
         whole_album_meta : false,
-        remove_url : true
+        remove_url : true,
+        to_json: "".to_string()
     };
     {
         let mut ap = ArgumentParser::new();
@@ -60,6 +64,9 @@ fn get_args() -> Options {
         ap.refer(&mut options.tag_num)
             .add_option(&["-n", "--no-tag-num"], StoreFalse,
             "Don't change the track number/disc number ");
+        ap.refer(&mut options.to_json)
+            .add_option(&["-J", "--only-write-json"], Store,
+            "Only store album meta data");
         ap.parse_args_or_exit();
     }
     return options
@@ -68,7 +75,14 @@ fn get_args() -> Options {
 fn main() {
     let options = get_args();
     println!("Args: {:?}", options);
+    match options.to_json.is_empty() {
+       true  => process_files(options),
+       false => only_write_json(options),
+    }
 
+}
+
+fn process_files(options:Options) {
     let album     = vgmdb::io::get_album(options.album_id).unwrap();
     let dir_paths = fs::read_dir    (&Path::new(&options.dir)).unwrap();
 
@@ -95,11 +109,65 @@ fn main() {
     }else{
         do_per_track(options, &paths, album);
     }
+}
+
+#[derive(RustcDecodable, RustcEncodable, Debug )]
+pub struct AlbumMeta {
+      pub release_date: Option<String>
+    , pub catalog: Option<String>
+    , pub category: Option<String>
+    , pub classification: Option<String>
+    , pub name: Option<String>
+    , pub comment: String
+}
+
+
+
+fn only_write_json(options:Options){
+    let album = vgmdb::io::get_album(options.album_id).unwrap();
+
+    {
+        let tracks = album.tracks();
+        let tracks_len = tracks.len();
+        // let discs_len = album.discs.len();
+
+        println!("Album: {:?}", album );
+    }
+
+    let mut buf = album.category.clone().unwrap_or("".to_string());
+    if let Some(o) = album.classification.clone(){
+        buf = format!("{}, {},",buf,o);
+    }else{
+        buf = format!("{},", buf);
+    }
+
+    let comment = format!(
+           "\n{}, vgmdb.net/album/{}, \n{}"
+         , album.catalog.clone().unwrap_or("".to_string())
+         , options.album_id
+         , buf );
+
+    let name =  if options.tag_album { Some(album.name)} else {None};
+    let meta = AlbumMeta{ comment:comment
+                        , release_date : album.release_date
+                        , catalog : album.catalog
+                        , category : album.category
+                        , classification : album.classification
+                        , name: name
+                        };
+
+    let mut f = File::create(options.to_json).unwrap();
+    f.write_all( json::encode(&meta).unwrap().as_bytes()).unwrap();
 
 }
 
+
 fn do_per_album_meta(options:Options, paths:&Vec<std::fs::DirEntry>, album:vgmdb::data::Album){
     println!("Album Metadata only");
+
+    // let mut f = File::create("foo.json").unwrap();
+    // f.write_all( json::encode(&album).unwrap().as_bytes()  ).unwrap();
+    // return;
 
     let mut pool = simple_parallel::Pool::new(4);
 
