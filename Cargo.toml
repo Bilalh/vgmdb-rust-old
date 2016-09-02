@@ -1,7 +1,7 @@
 [package]
 
 name = "vgmdb"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Bilal Syed Hussain <bilalshussain@gmail.com>"]
 
 description = "Retag mp3s using vgmdb "
@@ -13,11 +13,12 @@ readme = "readme.md"
 keywords = ["mp3", "vgmdb", "id3", "id3v2", "music" ]
 
 [dependencies]
-id3 = "*"
+id3 = "0.1.10"
 rustc-serialize = "0.3"
-url="*"
-argparse = "*"
+url = "1.2.0"
+argparse = "0.2.1"
 simple_parallel = "0.2"
+rand = "0.3.14"
 
 
 [profile.dev]
