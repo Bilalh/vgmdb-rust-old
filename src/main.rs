@@ -127,8 +127,8 @@ fn only_write_json(options:Options){
     let album = vgmdb::io::get_album(options.album_id).unwrap();
 
     {
-        let tracks = album.tracks();
-        let tracks_len = tracks.len();
+        // let tracks = album.tracks();
+        // let tracks_len = tracks.len();
         // let discs_len = album.discs.len();
 
         println!("Album: {:?}", album );

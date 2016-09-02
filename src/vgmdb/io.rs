@@ -1,7 +1,6 @@
 use std::process::Command;
 use std::process::Output;
 
-use std::io::prelude::*;
 use rustc_serialize::json;
 
 use vgmdb::errors::*;
@@ -61,7 +60,7 @@ fn convert_time(time: String) -> i32 {
     let mut length = 0;
     let mut mult = 1;
 
-    for part in ( time.rsplit(":") ) {
+    for part in time.rsplit(":") {
         // println!("part {}", part  );
         length += mult * part.parse::<i32>().unwrap_or(0);
         mult *= 60;
