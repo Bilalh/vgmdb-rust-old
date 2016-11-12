@@ -8,29 +8,53 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--debug', action='store_true', dest='debug', help='')
 args = parser.parse_args()
 
-#from http://vgmdb.net/album/52818
+# composer from http://vgmdb.net/album/59534
 artists = [
-  ("Hayato Asano",
-  ["04,07,11~14,25,29,30,36"
-  ,"01,04,06,07,08,09,15,16,18,26~38"]
-  ),
-
   ("Kazuki Yanagawa",
-  ["01,02,09,16,19,21~24,26,31"
-  ,"12~14,17,20~23,25"
-  ]),
-
+      ["07, 10-11, 17-18, 21-22, 24-25, 27-29, 31-32"
+      ,"01, 03, 14-16, 21, 23-24, 31"
+      ,"05, 08-11, 13-14, 18-20, 23-27, 29-30"
+      ,"02, 04, 08, 10-11, 14-20, 23-28, 30"
+      ]
+  ),
+  ("Tatsuya Yano",
+      ["02, 04-05, 08-09, 13-16, 20, 23"
+      ,"04-07, 09-10, 12, 17, 19-20, 22, 25-30"
+      ,"02-03, 06-07, 12, 15-17, 22"
+      ,"01, 03, 05-07, 12-13, 21-22"
+      ]
+  ),
   ("Daisuke Achiwa",
-  ["03,05,06,08,10,15,17,18,20,27,28,32,34"
-  ,"02,03,05,10,11,19,24"
-  ]),
-
-  ("Toshiharu Yamanishi",
-  [ "33,35"
-  , None
-  ])
-
+      ["03, 06, 12, 19, 26, 30"
+      ,"02, 08, 11, 13, 18"
+      ,"01, 04, 21"
+      ,"09"
+      ]
+  ),
+  ("Daisuke Achiwa, Kazuki Yanagawa",
+      [None
+      ,None
+      ,"28"
+      ,"29"
+      ]
+  ),
+  ("Atsushi Yuasa",
+      ["01"
+      ,None
+      ,None
+      ,None
+      ]
+  ),
+  ("Ryudai Abe",
+      [None
+      ,None
+      ,"31"
+      ,None
+      ]
+  ),
   ]
+
+
 num_disks = max( len(l) for (_,l) in artists )
 
 
@@ -40,6 +64,7 @@ def convert(s, *, key):
     nums = set()
     s_arr = s.split(",")
     for ele in s_arr:
+        ele = ele.strip()
         ele = ele.replace("~","-")
         parts = ele.split("-")
         if len(parts) == 1:
@@ -62,7 +87,7 @@ for dx in range(num_disks):
 
 for dx, disk in enumerate(disks):
     if max(disk) != len(disk):
-        print("disk {} not complete max {} len {}".format((dx+1), max(disk), len(disk)))
+        print("disk {} not complete: max {}, len {}".format((dx+1), max(disk), len(disk)))
         missing = set()
         for i in range(1,max(disk)+1):
             if i not in disk:

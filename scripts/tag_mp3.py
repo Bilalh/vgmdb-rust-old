@@ -10,6 +10,11 @@ from pprint import pprint
 parser = argparse.ArgumentParser(description="tag mp3 using vgmdb -J")
 parser.add_argument("dir", help='dir of mp3')
 parser.add_argument("json", help='json from vgmdb -J')
+parser.add_argument(
+    "-r",
+    help='release_date only',
+    action='store_true',
+    dest='release_date_only')
 
 args = parser.parse_args()
 # args = argparse.Namespace(dir="/Users/bilalh/aa", json="/Users/bilalh/aa/n.json")
@@ -25,6 +30,10 @@ for fp in Path(args.dir).expanduser().glob("*.mp3"):
     cur = ID3(filename=str(fp), v2_version=3)
     cur.update_to_v23()
     for key_json in allowed:
+
+        if args.release_date_only and key_json != 'release_date':
+            continue
+
         try:
             value = data[key_json]
             if value is not None:
@@ -40,7 +49,8 @@ for fp in Path(args.dir).expanduser().glob("*.mp3"):
                     cur.delall('COMM')
                     cur.delall('COMM::ENG')
                     cur.delall('COMM::XXX')
-                    cur.add(COMM(encoding=3, lang='eng', desc='', text=[value]))
+                    cur.add(
+                        COMM(encoding=3, lang='eng', desc='', text=[value]))
 
         except KeyError as e:
             pass
